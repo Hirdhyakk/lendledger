@@ -27,19 +27,17 @@ openssl rand -base64 24   # INTERNAL_API_KEY
 
 ---
 
-## Step 1 — Push code to GitHub
+## Step 1 — Push code to GitHub (CLI)
 
-From your machine:
+From `lendledger/` (check account first: `gh auth status`):
 
 ```bash
-cd lendledger
-git init
-git add .
-git commit -m "Initial LendLedger"
-gh repo create lendledger --public --source=. --push
+./scripts/setup-github.sh lendledger
 ```
 
-(Or create the repo on GitHub and `git remote add origin` + `git push`.)
+Repo: **https://github.com/Hirdhyakk/lendledger** (branch `main`).
+
+Full CLI cheat sheet: [CLI_WORKFLOW.md](CLI_WORKFLOW.md).
 
 ---
 

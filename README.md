@@ -106,7 +106,7 @@ docker compose up --build
 
 | Step | Action |
 |------|--------|
-| 1 | Push repo to GitHub |
+| 1 | `./scripts/setup-github.sh` → GitHub (`main`) |
 | 2 | Neon DB + run `deploy/neon-init.sql` |
 | 3 | Upstash Redis → copy `rediss://` URL |
 | 4 | Render Blueprint from `render.yaml` → set secrets |
