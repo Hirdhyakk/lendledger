@@ -1,0 +1,2 @@
+com.lendledger.common.config.CommonAutoConfiguration
+com.lendledger.common.config.WebMvcAutoConfiguration

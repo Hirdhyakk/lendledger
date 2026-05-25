@@ -1,0 +1,99 @@
+# Render Blueprint — import from repo root (Dashboard → New → Blueprint).
+# After deploy: set secrets in env group "lendledger-secrets" and service URLs on gateway/loan/payment.
+# See docs/DEPLOYMENT.md
+
+envVarGroups:
+  - name: lendledger-secrets
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SERVER_PORT
+        value: "8080"
+      - key: JAVA_OPTS
+        value: -Xmx384m -XX:+UseContainerSupport
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+
+services:
+  - type: web
+    name: lendledger-auth
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    dockerfilePath: ./deploy/docker/auth.Dockerfile
+    dockerContext: .
+    envVarGroups:
+      - lendledger-secrets
+
+  - type: web
+    name: lendledger-loan
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    dockerfilePath: ./deploy/docker/loan.Dockerfile
+    dockerContext: .
+    envVarGroups:
+      - lendledger-secrets
+    envVars:
+      - key: AUTH_SERVICE_URL
+        sync: false
+      - key: PAYMENT_SERVICE_URL
+        sync: false
+
+  - type: web
+    name: lendledger-payment
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    dockerfilePath: ./deploy/docker/payment.Dockerfile
+    dockerContext: .
+    envVarGroups:
+      - lendledger-secrets
+    envVars:
+      - key: LOAN_SERVICE_URL
+        sync: false
+
+  - type: web
+    name: lendledger-notification
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    dockerfilePath: ./deploy/docker/notification.Dockerfile
+    dockerContext: .
+    envVarGroups:
+      - lendledger-secrets
+
+  - type: web
+    name: lendledger-gateway
+    runtime: docker
+    plan: free
+    healthCheckPath: /actuator/health
+    dockerfilePath: ./deploy/docker/gateway.Dockerfile
+    dockerContext: .
+    envVarGroups:
+      - lendledger-secrets
+    envVars:
+      - key: AUTH_SERVICE_URL
+        sync: false
+      - key: LOAN_SERVICE_URL
+        sync: false
+      - key: PAYMENT_SERVICE_URL
+        sync: false
+      - key: NOTIFICATION_SERVICE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

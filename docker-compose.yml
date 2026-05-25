@@ -1,0 +1,128 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: lendledger
+      POSTGRES_USER: lendledger
+      POSTGRES_PASSWORD: lendledger
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        MODULE: services/auth-service
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: lendledger
+      DB_USER: lendledger
+      DB_PASSWORD: lendledger
+      JWT_SECRET: dev-jwt-secret-change-in-production-32chars
+      INTERNAL_API_KEY: dev-internal-key
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+
+  loan-service:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        MODULE: services/loan-service
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: lendledger
+      DB_USER: lendledger
+      DB_PASSWORD: lendledger
+      REDIS_HOST: redis
+      JWT_SECRET: dev-jwt-secret-change-in-production-32chars
+      INTERNAL_API_KEY: dev-internal-key
+      AUTH_SERVICE_URL: http://auth-service:8080
+      PAYMENT_SERVICE_URL: http://payment-service:8080
+    depends_on:
+      - postgres
+      - redis
+      - auth-service
+    ports:
+      - "8082:8080"
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        MODULE: services/payment-service
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: lendledger
+      DB_USER: lendledger
+      DB_PASSWORD: lendledger
+      REDIS_HOST: redis
+      INTERNAL_API_KEY: dev-internal-key
+      LOAN_SERVICE_URL: http://loan-service:8080
+    depends_on:
+      - postgres
+      - redis
+      - loan-service
+    ports:
+      - "8083:8080"
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        MODULE: services/notification-service
+    environment:
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: lendledger
+      DB_USER: lendledger
+      DB_PASSWORD: lendledger
+      REDIS_HOST: redis
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8084:8080"
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        MODULE: gateway/api-gateway
+    environment:
+      SERVER_PORT: 8080
+      REDIS_HOST: redis
+      JWT_SECRET: dev-jwt-secret-change-in-production-32chars
+      AUTH_SERVICE_URL: http://auth-service:8080
+      LOAN_SERVICE_URL: http://loan-service:8080
+      PAYMENT_SERVICE_URL: http://payment-service:8080
+      NOTIFICATION_SERVICE_URL: http://notification-service:8080
+      CORS_ORIGIN: http://localhost:5173
+    depends_on:
+      - auth-service
+      - loan-service
+      - payment-service
+      - notification-service
+      - redis
+    ports:
+      - "8080:8080"

@@ -1,0 +1,63 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+              - "${CORS_ORIGIN:https://lendledger.vercel.app}"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: auth
+          uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+        - id: payment
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/borrower/loans/*/repay,/api/borrower/loans/*/statement,/api/admin/reports/collections
+          filters:
+            - StripPrefix=1
+        - id: loan-admin-borrower
+          uri: ${LOAN_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/admin/**,/api/borrower/**
+          filters:
+            - StripPrefix=1
+        - id: notifications
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+lendledger:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-use-long-secret-key-32chars-min}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

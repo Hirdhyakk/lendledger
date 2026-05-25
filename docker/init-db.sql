@@ -1,0 +1,9 @@
+CREATE SCHEMA IF NOT EXISTS auth;
+CREATE SCHEMA IF NOT EXISTS loan;
+CREATE SCHEMA IF NOT EXISTS payment;
+CREATE SCHEMA IF NOT EXISTS notification;
+
+GRANT ALL ON SCHEMA auth TO lendledger;
+GRANT ALL ON SCHEMA loan TO lendledger;
+GRANT ALL ON SCHEMA payment TO lendledger;
+GRANT ALL ON SCHEMA notification TO lendledger;

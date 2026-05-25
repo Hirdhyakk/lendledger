@@ -1,0 +1,59 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --ll-primary: #1e3a5f;
+  --ll-accent: #0d6efd;
+  --ll-bg: #f4f6f9;
+}
+
+body {
+  background-color: var(--ll-bg);
+  min-height: 100vh;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 0.125rem 0.5rem rgba(30, 58, 95, 0.08);
+}
+
+.card-header {
+  background: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}
+
+.stat-card {
+  border-left: 4px solid var(--ll-accent);
+}
+
+.workflow-step {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.workflow-step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(30, 58, 95, 0.12);
+  color: inherit;
+}
+
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #0d6efd 100%);
+}
+
+.table thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+  font-weight: 600;
+}
