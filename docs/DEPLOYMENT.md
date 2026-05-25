@@ -21,8 +21,15 @@ Estimated time: **45–90 minutes** (mostly waiting for Render builds).
 Generate secrets locally (save them in a password manager):
 
 ```bash
-openssl rand -base64 48   # JWT_SECRET
-openssl rand -base64 24   # INTERNAL_API_KEY
+# Use one of these (do not paste the # comments on the same line):
+
+# Option A — Python (works everywhere)
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+python3 -c "import secrets; print(secrets.token_urlsafe(24))"
+
+# Option B — OpenSSL hex
+openssl rand -hex 32
+openssl rand -hex 16
 ```
 
 ---
@@ -163,6 +170,16 @@ Wake services (open gateway health in browser), then:
 ```bash
 GATEWAY_URL=https://lendledger-gateway.onrender.com ./scripts/smoke.sh
 ```
+
+### Wake services before each session (free tier)
+
+Render services sleep after ~15 min idle. Before using the Vercel app:
+
+```bash
+./scripts/wake-prod.sh
+```
+
+Or open each health URL in the browser (see script). Takes ~1–3 minutes when cold.
 
 Or full API E2E:
 

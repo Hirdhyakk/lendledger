@@ -67,8 +67,8 @@ gh pr create   # open a pull request
 ## 3. Production secrets (generate once)
 
 ```bash
-echo "JWT_SECRET=$(openssl rand -base64 48)"
-echo "INTERNAL_API_KEY=$(openssl rand -base64 24)"
+python3 -c "import secrets; print('JWT_SECRET=', secrets.token_urlsafe(48), sep='')"
+python3 -c "import secrets; print('INTERNAL_API_KEY=', secrets.token_urlsafe(24), sep='')"
 ```
 
 Copy into `deploy/env.example` locally (do not commit real values).
@@ -151,7 +151,14 @@ Then update Render gateway `CORS_ORIGIN` to your Vercel URL and redeploy gateway
 
 ---
 
-## 8. Verify production
+## 8. Wake production APIs (run before each work session)
+
+```bash
+cd lendledger
+./scripts/wake-prod.sh
+```
+
+## 9. Verify production
 
 ```bash
 GATEWAY_URL=https://lendledger-gateway.onrender.com ./scripts/smoke.sh
