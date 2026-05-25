@@ -1,9 +1,5 @@
-# Render Blueprint — import from repo root (Dashboard → New → Blueprint).
-# After deploy: set secrets in env group "lendledger-secrets" and service URLs on gateway/loan/payment.
-# See docs/DEPLOYMENT.md
-
 envVarGroups:
-  - name: lendledger-secrets
+  - name: lendledger-config
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
@@ -11,22 +7,22 @@ envVarGroups:
         value: "8080"
       - key: JAVA_OPTS
         value: -Xmx384m -XX:+UseContainerSupport
-      - key: DB_HOST
-        sync: false
       - key: DB_PORT
         value: "5432"
+      - key: DB_HOST
+        value: REPLACE_ME
       - key: DB_NAME
-        sync: false
+        value: neondb
       - key: DB_USER
-        sync: false
+        value: neondb_owner
       - key: DB_PASSWORD
-        sync: false
+        value: REPLACE_ME
       - key: REDIS_URL
-        sync: false
+        value: REPLACE_ME
       - key: JWT_SECRET
-        sync: false
+        value: REPLACE_ME
       - key: INTERNAL_API_KEY
-        sync: false
+        value: REPLACE_ME
 
 services:
   - type: web
@@ -36,8 +32,8 @@ services:
     healthCheckPath: /actuator/health
     dockerfilePath: ./deploy/docker/auth.Dockerfile
     dockerContext: .
-    envVarGroups:
-      - lendledger-secrets
+    envVars:
+      - fromGroup: lendledger-config
 
   - type: web
     name: lendledger-loan
@@ -46,13 +42,12 @@ services:
     healthCheckPath: /actuator/health
     dockerfilePath: ./deploy/docker/loan.Dockerfile
     dockerContext: .
-    envVarGroups:
-      - lendledger-secrets
     envVars:
+      - fromGroup: lendledger-config
       - key: AUTH_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
       - key: PAYMENT_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
 
   - type: web
     name: lendledger-payment
@@ -61,11 +56,10 @@ services:
     healthCheckPath: /actuator/health
     dockerfilePath: ./deploy/docker/payment.Dockerfile
     dockerContext: .
-    envVarGroups:
-      - lendledger-secrets
     envVars:
+      - fromGroup: lendledger-config
       - key: LOAN_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
 
   - type: web
     name: lendledger-notification
@@ -74,8 +68,8 @@ services:
     healthCheckPath: /actuator/health
     dockerfilePath: ./deploy/docker/notification.Dockerfile
     dockerContext: .
-    envVarGroups:
-      - lendledger-secrets
+    envVars:
+      - fromGroup: lendledger-config
 
   - type: web
     name: lendledger-gateway
@@ -84,16 +78,15 @@ services:
     healthCheckPath: /actuator/health
     dockerfilePath: ./deploy/docker/gateway.Dockerfile
     dockerContext: .
-    envVarGroups:
-      - lendledger-secrets
     envVars:
+      - fromGroup: lendledger-config
       - key: AUTH_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
       - key: LOAN_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
       - key: PAYMENT_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
       - key: NOTIFICATION_SERVICE_URL
-        sync: false
+        value: REPLACE_ME
       - key: CORS_ORIGIN
-        sync: false
+        value: REPLACE_ME
