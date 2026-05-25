@@ -2,3 +2,8 @@ spring:
   data:
     redis:
       url: ${REDIS_URL}
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 120000
+        response-timeout: 120s
